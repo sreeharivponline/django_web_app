@@ -1,0 +1,107 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Cart</title>
+    <link rel="stylesheet" href="{% static 'store/styles.css' %}">
+    <style>
+        /* Additional CSS for buttons */
+        .button {
+            background-color: #28a745; /* Green */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .remove-all {
+            background-color: #dc3545; /* Red */
+        }
+        .checkout {
+            background-color: #007bff; /* Blue */
+        }
+        .total {
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .checkout-form {
+            display: inline;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Your Cart</h1>
+        <nav>
+            <a href="{% url 'product_list' %}" class="button">Continue Shopping</a>
+            <form action="{% url 'remove_all_from_cart' %}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="button remove-all">Remove All</button>
+            </form>
+            <a href="{% url 'checkout' %}" class="button checkout">Checkout All</a>
+        </nav>
+    </header>
+    
+    <div class="cart-items">
+        {% if cart_items %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Product Name</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Action</th>
+                    <th>Checkout</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product_id, item in cart_items %}
+                <tr>
+                    <td>{{ item.name }}</td>
+                    <td>₹{{ item.price }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>
+                        <form action="{% url 'remove_from_cart' product_id %}" method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="button">Remove</button>
+                        </form>
+                    </td>
+                    <td>
+                        <form action="{% url 'checkout_product' product_id %}" method="get" class="checkout-form">
+                            <button type="submit" class="button checkout">Checkout</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>Your cart is empty.</p>
+        {% endif %}
+    </div>
+    
+    <p class="total">Total Items: {{ total_items }}</p>
+    <p class="total">Total Price: ₹{{ total_price }}</p>
+
+</body>
+</html>
